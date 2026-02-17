@@ -64,7 +64,9 @@ async def main():
             pass  # Response complete
 
         elif etype == "input_audio_buffer.speech_started":
-            print("[VAD] Speech started")
+            print("[VAD] Speech started — cancelling current response")
+            await client.send_cancel()
+            audio_out.flush()
 
         elif etype == "input_audio_buffer.speech_stopped":
             print("[VAD] Speech stopped — triggering response")
