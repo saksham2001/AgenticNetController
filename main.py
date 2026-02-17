@@ -30,10 +30,14 @@ async def main():
     audio_in = AudioInput()
     audio_out = AudioOutput()
 
+    # --- Half-duplex: mute mic while AI speaks to prevent feedback ---
+    ai_speaking = False
+
     # --- Event handler ---
     client: RealtimeClient | None = None
 
     async def handle_event(event: dict):
+        nonlocal ai_speaking
         etype = event.get("type", "")
 
         if etype == "session.created":
@@ -48,8 +52,13 @@ async def main():
             print("[Session] Updated OK")
 
         elif etype == "response.audio.delta":
+            ai_speaking = True
             pcm = base64.b64decode(event.get("delta", ""))
             audio_out.write(pcm)
+
+        elif etype == "response.audio.done":
+            ai_speaking = False
+            print("[Audio] AI finished speaking")
 
         elif etype == "response.function_call_arguments.done":
             name = event.get("name", "")
@@ -61,16 +70,20 @@ async def main():
             await client.send_function_output(call_id, result)
 
         elif etype == "response.done":
-            pass  # Response complete
+            ai_speaking = False
 
         elif etype == "input_audio_buffer.speech_started":
-            print("[VAD] Speech started — cancelling current response")
-            await client.send_cancel()
-            audio_out.flush()
+            if not ai_speaking:
+                print("[VAD] Speech started — cancelling current response")
+                await client.send_cancel()
+                audio_out.flush()
 
         elif etype == "input_audio_buffer.speech_stopped":
-            print("[VAD] Speech stopped — triggering response")
-            await client.send_response_create()
+            if not ai_speaking:
+                print("[VAD] Speech stopped — triggering response")
+                await client.send_response_create()
+            else:
+                print("[VAD] Speech stopped (ignored — AI still speaking)")
 
         elif etype == "error":
             print(f"[ERROR] {event.get('error', event)}")
@@ -84,12 +97,13 @@ async def main():
     audio_in.start(loop)
     audio_out.start()
 
-    # --- Audio send loop ---
+    # --- Audio send loop (muted while AI speaks to prevent feedback) ---
     async def audio_send_loop():
         try:
             while True:
                 frame = await audio_in.read_frame()
-                await client.send_audio(frame)
+                if not ai_speaking:
+                    await client.send_audio(frame)
         except asyncio.CancelledError:
             pass
 
