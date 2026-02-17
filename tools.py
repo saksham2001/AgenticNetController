@@ -63,7 +63,8 @@ TOOL_SCHEMAS = [
 
 
 def _valid_callsign(cs: str) -> bool:
-    return bool(re.match(r"^[A-Za-z0-9]{3,7}$", cs.strip()))
+    # Allow alphanumeric 3-10 chars, optional /portable suffix (e.g. W3VC/M)
+    return bool(re.match(r"^[A-Za-z0-9]{3,10}(/[A-Za-z0-9]{1,4})?$", cs.strip()))
 
 
 class ToolExecutor:

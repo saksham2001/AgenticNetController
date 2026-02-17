@@ -32,12 +32,13 @@ async def main():
 
     # --- Half-duplex: mute mic while AI speaks to prevent feedback ---
     ai_speaking = False
+    response_active = False
 
     # --- Event handler ---
     client: RealtimeClient | None = None
 
     async def handle_event(event: dict):
-        nonlocal ai_speaking
+        nonlocal ai_speaking, response_active
         etype = event.get("type", "")
 
         if etype == "session.created":
@@ -50,6 +51,9 @@ async def main():
 
         elif etype == "session.updated":
             print("[Session] Updated OK")
+
+        elif etype == "response.created":
+            response_active = True
 
         elif etype == "response.audio.delta":
             ai_speaking = True
@@ -71,12 +75,16 @@ async def main():
 
         elif etype == "response.done":
             ai_speaking = False
+            response_active = False
 
         elif etype == "input_audio_buffer.speech_started":
             if not ai_speaking:
-                print("[VAD] Speech started — cancelling current response")
-                await client.send_cancel()
-                audio_out.flush()
+                if response_active:
+                    print("[VAD] Speech started — cancelling current response")
+                    await client.send_cancel()
+                    audio_out.flush()
+                else:
+                    print("[VAD] Speech started")
 
         elif etype == "input_audio_buffer.speech_stopped":
             if not ai_speaking:
@@ -86,7 +94,12 @@ async def main():
                 print("[VAD] Speech stopped (ignored — AI still speaking)")
 
         elif etype == "error":
-            print(f"[ERROR] {event.get('error', event)}")
+            err = event.get("error", event)
+            # Suppress noisy cancel-not-active errors
+            if isinstance(err, dict) and err.get("code") == "response_cancel_not_active":
+                pass
+            else:
+                print(f"[ERROR] {err}")
 
     client = RealtimeClient(api_key=api_key, on_event=handle_event)
 
@@ -139,7 +152,7 @@ async def main():
                         print(f"[ERR] Unknown mode: {mode_str}")
                         print("  Valid: checkin, ragchew, emergency, wrapup")
                         continue
-                    directive = controller.set_mode(mode)
+                    directive = controller.set_mode(mode, stations=tool_exec.checked_in)
                     print(f"[Mode] → {mode.name}")
                     await client.send_response_create(instructions=directive)
 
