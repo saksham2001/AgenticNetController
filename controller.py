@@ -9,6 +9,7 @@ class NetMode(Enum):
     CHECKIN = "checkin"
     RAGCHEW = "ragchew"
     EMERGENCY = "emergency"
+    RECHECKIN = "recheckin"
     WRAPUP = "wrapup"
 
 
@@ -42,6 +43,14 @@ _MODE_DIRECTIVES = {
         "If nobody responds after a moment, start a conversation topic yourself "
         "(weather, ham radio, local events, etc.). "
         "Follow the RAGCHEW MODE BEHAVIOR procedure."
+    ),
+    NetMode.RECHECKIN: (
+        "OPERATOR DIRECTIVE: We are now in RECHECKIN mode. "
+        "FCC requires periodic station identification. "
+        "Call each checked-in station one by one from the roster and ask them to confirm they are still present. "
+        "Wait for each station to respond before moving to the next. "
+        "If a station does not respond after two attempts, note them as unresponsive. "
+        "After completing the roll call, announce how many stations confirmed."
     ),
     NetMode.EMERGENCY: (
         "OPERATOR DIRECTIVE: We are now in EMERGENCY mode. "

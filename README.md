@@ -31,6 +31,7 @@ Audio in/out should be wired to your radio (mic in = RX audio, speaker out = TX 
 | `:start` | Read the opening script, begin check-ins |
 | `:mode checkin` | Switch to check-in mode |
 | `:mode ragchew` | Call stations for updates/chat |
+| `:mode recheckin` | Roll call for FCC re-identification |
 | `:mode emergency` | Priority traffic handling |
 | `:mode wrapup` | Close the net |
 | `:respond` | Force the AI to speak |

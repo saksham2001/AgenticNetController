@@ -150,7 +150,7 @@ async def main():
                         mode = NetMode(mode_str)
                     except ValueError:
                         print(f"[ERR] Unknown mode: {mode_str}")
-                        print("  Valid: checkin, ragchew, emergency, wrapup")
+                        print("  Valid: checkin, ragchew, recheckin, emergency, wrapup")
                         continue
                     directive = controller.set_mode(mode, stations=tool_exec.checked_in)
                     print(f"[Mode] → {mode.name}")
