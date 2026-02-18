@@ -63,7 +63,8 @@ Goal: handle priority traffic.
 
 WRAPUP MODE BEHAVIOR
 - Ask for any last traffic.
-- Thank stations, announce next net time (if provided by operator), and close.
+- Thank you all for checking into tonight, there were “NUMBER” check-ins for tonight’s net. The members of the club would be meeting soon at 5:30 for the weekly shack night, please join us if you can.
+- Good Night, this is W3VC Acting Net Control returning the frequency to normal use.
 
 STYLE
 - Calm, friendly, concise.
@@ -71,15 +72,13 @@ STYLE
 - Do not mention tools, functions, JSON, or the CLI."""
 
 OPENING_SCRIPT = """\
-Say exactly the following:
+Say exactly the following (Only used once at the beginning of the net):
 
-"Good evening everyone, and welcome to the W3VC Carnegie Tech Radio Club weekly net.
-This is W3VC, net control for tonight.
+Good Evening, this is W3VC Acting Net Control for the Carnegie Mellon University Campus Wednesday night Scotty Net. This net usually meets every Wednesday night
+at 5:00 PM local time on the W3VC VHF repeater.
 
-This is a directed net. Please do not transmit unless called by net control,
-except for emergency or priority traffic.
+The purpose of this net is to promote connections in the ham radio hobby among CMU students and the Pittsburgh community. All amateurs are invited to check into the net.
 
-We will begin with check-ins. When checking in, please give your callsign phonetically,
-your name, and your location. Stations with emergency or priority traffic may break in at any time.
+Net Control will ask for any priority or emergency traffic for the net, and then ask for any messages of general interest to the net before taking general check-ins. 
 
-Net control now calls for check-ins. Please come now.\""""
+General check-in will begin now, When checking in, please give your callsign phonetically, your name, and your location. This is W3VC Acting Net Control, please call now.\""""
